@@ -1,187 +1,29 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>NCB Calculator</title>
-
-<style>
-
-body{
-    font-family:Arial;
-    background:#f2f4f7;
-    margin:0;
-    padding:30px;
-}
-
-.container{
-    max-width:1200px;
-    margin:auto;
-}
-
-.row{
-    display:flex;
-    gap:20px;
-    flex-wrap:wrap;
-}
-
-.card{
-    flex:1;
-    min-width:350px;
-    background:#fff;
-    padding:25px;
-    border-radius:15px;
-    box-shadow:0 2px 15px rgba(0,0,0,0.1);
-}
-
-h2{
-    background:#1f4e78;
-    color:white;
-    padding:15px;
-    text-align:center;
-    border-radius:10px;
-}
-
-label{
-    display:block;
-    margin-top:15px;
-    font-weight:bold;
-}
-
-input{
-    width:100%;
-    padding:12px;
-    border:1px solid #ccc;
-    border-radius:8px;
-    font-size:16px;
-    box-sizing:border-box;
-}
-
-.btn{
-    width:48%;
-    padding:12px;
-    margin-top:20px;
-    border:none;
-    border-radius:8px;
-    font-size:16px;
-    cursor:pointer;
-}
-
-.calculate{
-    background:#1f4e78;
-    color:white;
-}
-
-.reset{
-    background:#777;
-    color:white;
-}
-
-.result{
-    margin-top:20px;
-    background:#dff0d8;
-    padding:20px;
-    border-radius:10px;
-    font-size:24px;
-    text-align:center;
-    font-weight:bold;
-}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:20px;
-}
-
-th{
-    background:#1f4e78;
-    color:white;
-    padding:10px;
-}
-
-td{
-    border:1px solid #ddd;
-    padding:10px;
-    text-align:center;
-}
-
-.current{
-    background:#c6efce;
-    font-weight:bold;
-}
-
-.footer{
-    text-align:center;
-    margin-top:30px;
-    color:#666;
-    font-size:15px;
-}
-
-@media(max-width:800px){
-    .row{
-        flex-direction:column;
-    }
-
-    .btn{
-        width:100%;
-        margin-top:10px;
-    }
-}
-
-</style>
-</head>
-
-<body>
-
-<div class="container">
-
-<div class="row">
-
-<div class="card">
-
-<h2>CLAIM NCB</h2>
-
-<label>Last Claim Date</label>
-<input type="date" id="claimDate">
-
-<label>Policy Due Date</label>
-<input type="date" id="claimDue">
-
-<button class="btn calculate" onclick="claimCalc()">
-Calculate NCB
-</button>
-
-<button class="btn reset" onclick="resetClaim()">
-Reset
-</button>
-
-<div class="result" id="claimResult">
-Eligible NCB : --
-</div>
-
-<table id="claimTable" style="display:none;">
-<tr>
-<th>Policy Year</th>
-<th>NCB</th>
-</tr>
-</table>
-
-</div>
-
-<div class="card">
-
 <h2>NON CLAIM NCB</h2>
 
 <label>Registration Date</label>
 <input type="date" id="regDate">
 
+<p style="text-align:center;
+font-weight:bold;
+margin:15px 0;">
+OR
+</p>
+
+<label>Manufacturing Year</label>
+<input type="number"
+id="mfgYear"
+placeholder="2023">
+
 <label>Policy Due Date</label>
 <input type="date" id="nonDue">
 
-<button class="btn calculate" onclick="nonClaimCalc()">
+<button class="btn calculate"
+onclick="nonClaimCalc()">
 Calculate NCB
 </button>
 
-<button class="btn reset" onclick="resetNonClaim()">
+<button class="btn reset"
+onclick="resetNonClaim()">
 Reset
 </button>
 
@@ -189,157 +31,50 @@ Reset
 Eligible NCB : --
 </div>
 
-<table id="nonTable" style="display:none;">
+<table id="nonTable"
+style="display:none;">
 <tr>
 <th>Policy Year</th>
 <th>NCB</th>
 </tr>
 </table>
+function nonClaimCalc(){
 
-</div>
+    let reg =
+    document.getElementById(
+    "regDate").value;
 
-</div>
-
-<div class="footer">
-🚗 Created By - Manohar Chalwadi
-</div>
-<script>
-
-function claimCalc(){
-
-    let c = new Date(
-        document.getElementById("claimDate").value
-    );
+    let year =
+    document.getElementById(
+    "mfgYear").value;
 
     let d = new Date(
-        document.getElementById("claimDue").value
-    );
+    document.getElementById(
+    "nonDue").value);
 
-    if(isNaN(c) || isNaN(d)){
-        alert("Please select both dates.");
+    let r;
+
+    if(reg!=""){
+        r = new Date(reg);
+    }
+    else if(year!=""){
+        r = new Date(year,0,1);
+    }
+    else{
+        alert(
+        "Enter Registration Date OR Manufacturing Year");
         return;
     }
 
-    let renewalYear = c.getFullYear();
-
-    let dueMonth = d.getMonth();
-    let dueDay = d.getDate();
-
-    if(
-        c.getMonth() > dueMonth ||
-        (
-            c.getMonth() == dueMonth &&
-            c.getDate() >= dueDay
-        )
-    ){
-        renewalYear += 1;
-    }
-
-    let step =
-        d.getFullYear() - renewalYear;
-
-    let ncb = "0%";
-
-    if(step == 1)
-        ncb = "20%";
-    else if(step == 2)
-        ncb = "25%";
-    else if(step == 3)
-        ncb = "35%";
-    else if(step == 4)
-        ncb = "45%";
-    else if(step >= 5)
-        ncb = "50%";
-
-    document.getElementById(
-        "claimResult"
-    ).innerHTML =
-    "Eligible NCB : " + ncb;
-
-    let tbl =
-        document.getElementById(
-            "claimTable"
-        );
-
-    tbl.style.display = "table";
-
-    tbl.innerHTML =
-    "<tr><th>Policy Year</th><th>NCB</th></tr>";
-
-    let values = [
-        "0%",
-        "20%",
-        "25%",
-        "35%",
-        "45%",
-        "50%"
-    ];
-
-    for(
-        let i = 0;
-        i <= step && i < 6;
-        i++
-    ){
-
-        let y =
-            renewalYear + i;
-
-        let row =
-            tbl.insertRow();
-
-        if(i == step){
-            row.className =
-            "current";
-        }
-
-        row.insertCell(0)
-        .innerHTML =
-        y + "-" + (y+1);
-
-        row.insertCell(1)
-        .innerHTML =
-        values[i];
-    }
-}
-
-function resetClaim(){
-
-    document.getElementById(
-        "claimDate"
-    ).value = "";
-
-    document.getElementById(
-        "claimDue"
-    ).value = "";
-
-    document.getElementById(
-        "claimResult"
-    ).innerHTML =
-    "Eligible NCB : --";
-
-    document.getElementById(
-        "claimTable"
-    ).style.display =
-    "none";
-}
-    function nonClaimCalc(){
-
-    let r = new Date(
-        document.getElementById("regDate").value
-    );
-
-    let d = new Date(
-        document.getElementById("nonDue").value
-    );
-
-    if(isNaN(r) || isNaN(d)){
-        alert("Please select both dates.");
+    if(isNaN(d)){
+        alert(
+        "Select Policy Due Date");
         return;
     }
 
     let years =
-        d.getFullYear() -
-        r.getFullYear();
+    d.getFullYear() -
+    r.getFullYear();
 
     let ncb = "0%";
 
@@ -355,41 +90,39 @@ function resetClaim(){
         ncb = "50%";
 
     document.getElementById(
-        "nonResult"
-    ).innerHTML =
+    "nonResult").innerHTML =
     "Eligible NCB : " + ncb;
 
     let tbl =
-        document.getElementById(
-            "nonTable"
-        );
+    document.getElementById(
+    "nonTable");
 
-    tbl.style.display = "table";
+    tbl.style.display =
+    "table";
 
     tbl.innerHTML =
     "<tr><th>Policy Year</th><th>NCB</th></tr>";
 
     let values = [
-        "20%",
-        "25%",
-        "35%",
-        "45%",
-        "50%"
+    "20%",
+    "25%",
+    "35%",
+    "45%",
+    "50%"
     ];
 
     for(
-        let i = 0;
-        i < years && i < 5;
-        i++
-    ){
+    let i=0;
+    i<years && i<5;
+    i++){
 
         let y =
-            r.getFullYear() + i;
+        r.getFullYear()+i;
 
         let row =
-            tbl.insertRow();
+        tbl.insertRow();
 
-        if(i == years-1){
+        if(i==years-1){
             row.className =
             "current";
         }
@@ -407,25 +140,19 @@ function resetClaim(){
 function resetNonClaim(){
 
     document.getElementById(
-        "regDate"
-    ).value = "";
+    "regDate").value="";
 
     document.getElementById(
-        "nonDue"
-    ).value = "";
+    "mfgYear").value="";
 
     document.getElementById(
-        "nonResult"
-    ).innerHTML =
+    "nonDue").value="";
+
+    document.getElementById(
+    "nonResult").innerHTML =
     "Eligible NCB : --";
 
     document.getElementById(
-        "nonTable"
-    ).style.display =
+    "nonTable").style.display =
     "none";
 }
-
-</script>
-
-</body>
-</html>
